@@ -1,0 +1,9 @@
+{
+  "name": "reise-uebersetzer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "German <-> English voice translator",
+  "scripts": { "start": "node --env-file=.env server.js" },
+  "engines": { "node": ">=20.6" }
+}

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Переводчик · English ⇄ Russian Voice Translator</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--text:#1d1d1f;--muted:#6b6b72;--line:#e3e0d8;--en:#2457d6;--ru:#c2410c;--ok:#15803d;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141416;--card:#1f1f23;--text:#f2f2f4;--muted:#9c9ca6;--line:#2e2e34;--en:#7aa2ff;--ru:#ff9a62;--ok:#4ade80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141416;--card:#1f1f23;--text:#f2f2f4;--muted:#9c9ca6;--line:#2e2e34;--en:#7aa2ff;--ru:#ff9a62;--ok:#4ade80;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:1.3rem;margin:4px 0 2px}
+.sub{color:var(--muted);font-size:.9rem;margin:0 0 16px}
+.mics{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mic{border:2px solid var(--line);background:var(--card);color:var(--text);border-radius:20px;padding:22px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font:inherit;transition:transform .1s,border-color .2s;min-height:150px}
+.mic:active{transform:scale(.97)}
+.mic .ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.mic.en .ic{background:var(--en)}.mic.ru .ic{background:var(--ru)}
+.mic.en:hover{border-color:var(--en)}.mic.ru:hover{border-color:var(--ru)}
+.mic b{font-size:1.05rem}.mic small{color:var(--muted)}
+.mic.live{border-color:#dc2626;animation:pulse 1.2s infinite}
+.mic.live .ic{background:#dc2626}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(220,38,38,.18)}}
+@media (prefers-reduced-motion:reduce){.mic.live{animation:none}}
+.status{min-height:1.5em;text-align:center;color:var(--muted);margin:12px 0;font-size:.95rem}
+.status.err{color:#dc2626}
+.type{display:flex;gap:8px;margin:4px 0 16px}
+.type select,.type input{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;padding:12px}
+.type input{flex:1;min-width:0}
+.type button{font:inherit;border:0;background:var(--text);color:var(--bg);border-radius:12px;padding:0 18px;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:12px}
+.card .tag{font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.card .src{color:var(--muted);margin:2px 0 8px}
+.card .out{font-size:1.35rem;line-height:1.35;font-weight:600;overflow-wrap:anywhere}
+.card.to-en .out{color:var(--en)}.card.to-ru .out{color:var(--ru)}
+.acts{display:flex;gap:8px;margin-top:10px}
+.acts button{font:inherit;font-size:.9rem;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:6px 14px;cursor:pointer}
+.sec{display:flex;justify-content:space-between;align-items:center;margin:20px 0 8px}
+.sec h2{font-size:1rem;margin:0}
+.sec button{font:inherit;font-size:.85rem;background:none;border:0;color:var(--muted);cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:8px 14px;cursor:pointer}
+.empty{color:var(--muted);text-align:center;padding:18px 0}
+.note{color:var(--muted);font-size:.8rem;margin-top:20px;text-align:center}
+@media (max-width:480px){.mic{min-height:130px;padding:16px 6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Russian Translator</h1>
+  <p class="sub">Tap a microphone, speak, and hear the translation. · Нажмите, говорите, слушайте перевод.</p>
+
+  <div class="mics">
+    <button class="mic en" id="micEn" aria-label="Speak English, translate to Russian">
+      <span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
+      <b>English</b><small>→ Русский</small>
+    </button>
+    <button class="mic ru" id="micRu" aria-label="Говорить по-русски, перевести на английский">
+      <span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
+      <b>Русский</b><small>→ English</small>
+    </button>
+  </div>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+
+  <div class="type">
+    <select id="dir" aria-label="Typing direction"><option value="en">EN → RU</option><option value="ru">RU → EN</option></select>
+    <input id="txt" placeholder="Or type here… / Или введите текст…" autocomplete="off">
+    <button id="go">Go</button>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="sec"><h2>Quick phrases · Быстрые фразы</h2></div>
+  <div class="chips" id="chips"></div>
+
+  <div class="sec"><h2>History · История</h2><button id="clear">Clear</button></div>
+  <div id="hist"><div class="empty">Nothing yet.</div></div>
+
+  <p class="note">Voice input (and Russian playback) works best in Chrome, Edge or Safari with microphone permission. Made by John Paul Hilson </p>
+</div>
+
+<script>
+(function(){
+  var LANG={en:{code:"en-US",name:"English"},ru:{code:"ru-RU",name:"Russian"}};
+  var $=function(i){return document.getElementById(i)};
+  var status=$("status"),history=[],busy=false,rec=null;
+  var PHRASES=[
+    ["en","Where is the train station?"],["en","How much does this cost?"],["en","Can I pay by card?"],
+    ["en","I’m allergic to nuts."],["en","Could you speak more slowly, please?"],["en","I need a doctor."],
+    ["en","One ticket to Berlin, please."],["en","Where is the nearest restroom?"],["en","Can you help me, please?"],["ru","Вы говорите по-английски?"]
+  ];
+
+  function setStatus(t,err){status.textContent=t||"";status.className="status"+(err?" err":"")}
+  function other(l){return l==="en"?"ru":"en"}
+
+  async function translate(text,from){
+    var res=await fetch("/api/translate",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({text:text,from:from,to:other(from)})
+    });
+    var data={};
+    try{data=await res.json()}catch(e){}
+    if(!res.ok) throw new Error(data.error||"Translation failed ("+res.status+").");
+    return (data.translation||"").trim();
+  }
+
+  function speak(text,lang){
+    if(!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);u.lang=LANG[lang].code;u.rate=.95;
+    var v=speechSynthesis.getVoices().filter(function(x){return x.lang&&x.lang.indexOf(lang)===0})[0];
+    if(v)u.voice=v;
+    speechSynthesis.speak(u);
+  }
+
+  function render(item){
+    var d=document.createElement("div");
+    d.className="card to-"+item.to;
+    var tag=document.createElement("div");tag.className="tag";tag.textContent=LANG[item.from].name+" → "+LANG[item.to].name;
+    var s=document.createElement("div");s.className="src";s.textContent=item.src;
+    var o=document.createElement("div");o.className="out";o.textContent=item.out;
+    var a=document.createElement("div");a.className="acts";
+    var p=document.createElement("button");p.textContent="🔊 Play";p.onclick=function(){speak(item.out,item.to)};
+    var c=document.createElement("button");c.textContent="Copy";c.onclick=function(){
+      try{navigator.clipboard.writeText(item.out);c.textContent="Copied ✓";setTimeout(function(){c.textContent="Copy"},1200)}catch(e){}
+    };
+    a.appendChild(p);a.appendChild(c);
+    d.appendChild(tag);d.appendChild(s);d.appendChild(o);d.appendChild(a);
+    return d;
+  }
+
+  function renderHist(){
+    var h=$("hist");h.textContent="";
+    if(!history.length){h.innerHTML='<div class="empty">Nothing yet.</div>';return}
+    history.slice(1).forEach(function(i){h.appendChild(render(i))});
+    if(history.length===1){h.innerHTML='<div class="empty">Earlier translations will appear here.</div>'}
+  }
+
+  async function run(text,from){
+    text=(text||"").trim();
+    if(!text||busy) return;
+    busy=true;setStatus("Translating… / Перевожу…");
+    try{
+      var out=await translate(text,from);
+      if(!out) throw new Error("Empty translation.");
+      var item={from:from,to:other(from),src:text,out:out};
+      history.unshift(item);
+      var r=$("result");r.textContent="";r.appendChild(render(item));
+      renderHist();setStatus("");
+      speak(out,item.to);
+    }catch(e){
+      var m=(e&&e.message)||"Translation failed. Please try again.";
+      setStatus(m,true);
+    }finally{busy=false}
+  }
+
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  function listen(lang,btn){
+    if(!SR){setStatus("Voice input isn’t supported in this browser. Please type instead, or try Chrome/Safari.",true);return}
+    if(rec){rec.stop();return}
+    if("speechSynthesis" in window)speechSynthesis.cancel();
+    rec=new SR();rec.lang=LANG[lang].code;rec.interimResults=true;rec.maxAlternatives=1;rec.continuous=false;
+    var finalText="",interim="";
+    btn.classList.add("live");setStatus("Listening… / Слушаю…");
+    rec.onresult=function(e){
+      interim="";
+      for(var i=e.resultIndex;i<e.results.length;i++){
+        var t=e.results[i][0].transcript;
+        if(e.results[i].isFinal)finalText+=t;else interim+=t;
+      }
+      setStatus("“"+(finalText+interim)+"”");
+    };
+    rec.onerror=function(e){
+      var m={"not-allowed":"Microphone access is blocked. Allow it in your browser settings.","service-not-allowed":"Microphone access is blocked. Allow it in your browser settings.","no-speech":"I didn’t hear anything. Try again.","audio-capture":"No microphone found.","network":"Network error during speech recognition."}[e.error];
+      if(e.error!=="aborted")setStatus(m||"Speech recognition error: "+e.error,true);
+      finalText="";interim="";
+    };
+    rec.onend=function(){
+      btn.classList.remove("live");rec=null;
+      var t=(finalText||interim).trim();
+      if(t)run(t,lang);
+    };
+    try{rec.start()}catch(err){rec=null;btn.classList.remove("live")}
+  }
+
+  $("micEn").onclick=function(){listen("en",$("micEn"))};
+  $("micRu").onclick=function(){listen("ru",$("micRu"))};
+  function typed(){var v=$("txt").value;$("txt").value="";run(v,$("dir").value)}
+  $("go").onclick=typed;
+  $("txt").addEventListener("keydown",function(e){if(e.key==="Enter")typed()});
+  $("clear").onclick=function(){history=[];$("result").textContent="";renderHist()};
+
+  PHRASES.forEach(function(p){
+    var b=document.createElement("button");b.className="chip";b.textContent=p[1];
+    b.onclick=function(){run(p[1],p[0])};
+    $("chips").appendChild(b);
+  });
+  if("speechSynthesis" in window)speechSynthesis.getVoices();
+  if(!SR)setStatus("Voice input isn’t available in this browser, but typing works.");
+})();
+</script>
+</body>
+</html>
